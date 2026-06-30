@@ -446,7 +446,7 @@ export async function saveBackendUrl(url) {
  * @returns {Promise<string>}
  */
 export async function getBackendUrl() {
-  return await get(STORAGE_KEYS.BACKEND_URL, 'http://localhost:3000');
+  return await get(STORAGE_KEYS.BACKEND_URL, 'https://devassist-yfli.onrender.com');
 }
 
 /* ─────────────────────────────────────────────

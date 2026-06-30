@@ -10,14 +10,14 @@ if (window.location.search.includes('mock=true')) {
   console.log('[DevAssist Mock] Initializing mocks for local testing');
   localStorage.setItem('authMethod', "oauth");
   localStorage.setItem('githubOauthToken', "mock-github-token");
-  localStorage.setItem('backendUrl', "http://localhost:3000");
+  localStorage.setItem('backendUrl', "https://devassist-yfli.onrender.com");
   localStorage.setItem('geminiApiKey', "mock-gemini-key");
 
   if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
     chrome.storage.local.set({
       authMethod: 'oauth',
       githubOauthToken: 'mock-github-token',
-      backendUrl: 'http://localhost:3000',
+      backendUrl: 'https://devassist-yfli.onrender.com',
       geminiApiKey: 'mock-gemini-key'
     }, () => {
       console.log('[DevAssist Mock] chrome.storage.local populated');

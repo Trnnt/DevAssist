@@ -714,7 +714,7 @@ function attachEventListeners(userMenu) {
   // Save settings button
   saveSettingsBtn?.addEventListener('click', async () => {
     // Gemini key is managed exclusively via the AI Workspace setup card and AI Settings panel.
-    const backendUrl = $('backend-url-input')?.value.trim() || 'http://localhost:3000';
+    const backendUrl = $('backend-url-input')?.value.trim() || 'https://devassist-yfli.onrender.com';
     const notifsCheckbox = $('notifications-enabled-checkbox');
     const dbSelect = $('dashboard-layout-select');
     const aiSelect = $('ai-mode-select');

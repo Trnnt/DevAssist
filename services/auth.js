@@ -388,7 +388,7 @@ class AuthStateManagerClass {
         return null;
       }
 
-      const backendUrl = (await getBackendUrl() || 'http://localhost:3000').replace(/\/$/, '');
+      const backendUrl = (await getBackendUrl() || 'https://devassist-yfli.onrender.com').replace(/\/$/, '');
       const response = await fetch(`${backendUrl}/auth/refresh`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
