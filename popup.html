@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="GitHub Developer Assistant — Analyze profiles, visualize stats, and get AI insights." />
+  <title>GitHub Developer Assistant</title>
+
+  <!-- Debug Mock Script -->
+  <script src="mock.js"></script>
+
+  <!-- Chart.js Local -->
+  <script src="lib/chart.umd.js"></script>
+  
+  <!-- Mermaid Local -->
+  <script src="lib/mermaid.min.js"></script>
+
+  <!-- Google Fonts: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <!-- ═══════════════════════════════════════════
+       POPUP WRAPPER
+  ═══════════════════════════════════════════ -->
+  <div class="popup-wrapper" id="popup-wrapper">
+
+    <!-- ── Unauthenticated Welcome Screen ── -->
+    <div class="unauth-container" id="unauth-container" style="display: none;">
+      <div class="unauth-card">
+        <div class="unauth-header">
+          <div class="unauth-logo">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/>
+              <path d="M9 18c-4.51 2-5-2-7-2"/>
+            </svg>
+          </div>
+          <h2 class="unauth-title">Connect DevAssist to GitHub</h2>
+          <p class="unauth-subtitle">Sign in with your GitHub account to unlock repository analysis, developer stats, and AI insights.</p>
+        </div>
+
+        <div class="unauth-actions">
+          <button class="primary-login-btn" id="unauth-oauth-btn" type="button">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/>
+            </svg>
+            Continue with GitHub
+          </button>
+          <div class="unauth-error" id="unauth-error" style="display:none;"></div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ── Loading Overlay ── -->
+    <div class="loading-overlay" id="login-loading-overlay" style="display: flex;">
+      <div class="spinner-container">
+        <div class="spinner"></div>
+        <div class="loading-text" id="login-loading-text">Initializing DevAssist...</div>
+      </div>
+    </div>
+
+    <!-- ── Left Sidebar (48px) ── -->
+    <aside class="popup-sidebar" id="popup-sidebar" style="display: none;">
+      <div class="sidebar-top">
+        <!-- Dashboard Button -->
+        <button
+          class="sidebar-icon active tab-btn"
+          data-tab="profile"
+          id="tab-btn-profile"
+          role="tab"
+          aria-selected="true"
+          aria-controls="tab-profile"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+          <span class="sidebar-tooltip">Dashboard</span>
+        </button>
+
+        <!-- Repos Button -->
+        <button
+          class="sidebar-icon tab-btn"
+          data-tab="repos"
+          id="tab-btn-repos"
+          role="tab"
+          aria-selected="false"
+          aria-controls="tab-repos"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+          </svg>
+          <span class="sidebar-tooltip">Repositories</span>
+        </button>
+
+
+
+        <!-- Analytics Button -->
+        <button
+          class="sidebar-icon tab-btn"
+          data-tab="dashboard"
+          id="tab-btn-dashboard"
+          role="tab"
+          aria-selected="false"
+          aria-controls="tab-dashboard"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="20" x2="18" y2="10"></line>
+            <line x1="12" y1="20" x2="12" y2="4"></line>
+            <line x1="6" y1="20" x2="6" y2="14"></line>
+          </svg>
+          <span class="sidebar-tooltip">Analytics</span>
+        </button>
+
+        <!-- AI Workspace Button -->
+        <button
+          class="sidebar-icon tab-btn"
+          data-tab="ai"
+          id="tab-btn-ai"
+          role="tab"
+          aria-selected="false"
+          aria-controls="tab-ai"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/>
+          </svg>
+          <span class="sidebar-tooltip">AI Workspace</span>
+        </button>
+
+        <!-- Favorites Button -->
+        <button
+          class="sidebar-icon tab-btn"
+          data-tab="favorites"
+          id="tab-btn-favorites"
+          role="tab"
+          aria-selected="false"
+          aria-controls="tab-favorites"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+          </svg>
+          <span class="sidebar-tooltip">Favorites</span>
+        </button>
+
+        <!-- History Button -->
+        <button
+          class="sidebar-icon tab-btn"
+          data-tab="history"
+          id="tab-btn-history"
+          role="tab"
+          aria-selected="false"
+          aria-controls="tab-history"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+          <span class="sidebar-tooltip">History</span>
+        </button>
+      </div>
+
+      <div class="sidebar-spacer"></div>
+
+      <!-- Settings Button at Bottom -->
+      <div class="sidebar-bottom">
+        <button class="sidebar-icon" id="settings-btn" title="Settings" aria-label="Open settings">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+          <span class="sidebar-tooltip">Settings</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- ── Main Layout Area ── -->
+    <div class="main-layout" id="main-layout" style="display: none;">
+
+      <!-- Top Alert Banner -->
+      <div class="session-banner" id="session-banner" style="display: none;">
+        <span class="banner-icon"></span>
+        <span class="banner-message" id="banner-message">You are currently offline. Cached data remains available.</span>
+        <button class="close-banner-btn" id="close-banner-btn" title="Dismiss" aria-label="Dismiss banner">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <!-- ── Header ── -->
+      <header class="popup-header" id="popup-header">
+        <!-- Left: Page Title -->
+        <h1 class="page-title" id="page-title">Dashboard</h1>
+
+        <!-- Center: Search Input -->
+        <div class="search-section" id="search-section">
+          <div class="search-wrapper">
+            <input
+              type="text"
+              id="search-input"
+              class="search-input"
+              placeholder="Search developers..."
+              autocomplete="off"
+              autocorrect="off"
+              autocapitalize="none"
+              spellcheck="false"
+              aria-label="GitHub username"
+            />
+            <button class="search-btn" id="search-btn" aria-label="Search">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Right: Actions & User Avatar -->
+        <div class="header-right">
+          <button class="icon-btn" id="notifications-btn" title="Notifications" aria-label="Open notifications">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+            </svg>
+            <span class="notification-badge" id="notification-badge" style="display: none;"></span>
+          </button>
+          <button class="icon-btn" id="theme-toggle-btn" title="Switch theme" aria-label="Toggle theme">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="5"></circle>
+              <line x1="12" y1="1" x2="12" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="23"></line>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+              <line x1="1" y1="12" x2="3" y2="12"></line>
+              <line x1="21" y1="12" x2="23" y2="12"></line>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+          </button>
+          <div class="avatar-circle" id="header-avatar-container" title="User profile" tabindex="0" role="button" aria-haspopup="true" aria-expanded="false" aria-label="User session menu">
+            <img id="header-avatar" class="header-avatar-img" src="" alt="Avatar" />
+            <div id="header-avatar-initials" class="header-avatar-initials" style="display:none"></div>
+            <div id="header-avatar-placeholder" class="header-avatar-placeholder-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+            </div>
+            <!-- Dynamic Status Badge Indicator Ring -->
+            <span class="avatar-status-ring"></span>
+          </div>
+        </div>
+
+        <!-- User Session Menu Dropdown -->
+        <div class="user-menu-dropdown" id="user-menu-dropdown" style="display: none;" role="menu" aria-label="User Session Menu" tabindex="-1">
+          <!-- Populated by components/userMenu.js -->
+        </div>
+
+        <!-- Settings Panel Drawer (absolute positioned overlay) -->
+        <div class="settings-panel" id="settings-panel" role="dialog" aria-label="Settings">
+          <div class="settings-header">
+            <h4>Settings</h4>
+            <button class="close-panel-btn" id="close-settings-panel-btn" title="Close Settings" aria-label="Close Settings" type="button">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+          </div>
+          <div class="settings-body">
+            <div class="settings-section">
+              <div class="settings-section-title">Authentication</div>
+              <div class="oauth-connection-status" id="auth-method-status">
+                <span class="status-dot"></span>
+                <span id="auth-method-status-text">GitHub OAuth</span>
+              </div>
+            </div>
+
+            <!-- OAuth Section -->
+            <div class="settings-section" id="settings-oauth-section">
+              <div class="settings-section-title">GitHub OAuth Application</div>
+              
+              <!-- OAuth Status Card -->
+              <div class="auth-status-card" id="oauth-status-card">
+                <div class="auth-status-header">
+                  <span class="auth-status-badge not-connected" id="oauth-status-badge">
+                    <span class="status-dot"></span>
+                    <span class="status-text" id="oauth-status-text">Not Connected</span>
+                  </span>
+                </div>
+                
+                <!-- OAuth Connection Details -->
+                <div class="auth-details-area" id="oauth-details-area" style="display: none;">
+                  <div class="connection-card-timestamps">
+                    <div class="timestamp-row">
+                      <span class="timestamp-label">Connected Account:</span>
+                      <span class="timestamp-val" id="oauth-username-val">@username</span>
+                    </div>
+                    <div class="timestamp-row">
+                      <span class="timestamp-label">Auth Method:</span>
+                      <span class="timestamp-val">GitHub OAuth App</span>
+                    </div>
+                    <div class="timestamp-row">
+                      <span class="timestamp-label">Last Validated:</span>
+                      <span class="timestamp-val" id="oauth-validated-at-val">-</span>
+                    </div>
+                  </div>
+                  <button class="connection-btn logout-btn" id="oauth-disconnect-btn" type="button">Disconnect OAuth</button>
+                </div>
+                
+                <!-- OAuth Input Form -->
+                <div class="auth-form-area" id="oauth-form-area">
+                  <div class="settings-field">
+                    <label>OAuth Redirect URI</label>
+                    <div class="redirect-uri-wrapper">
+                      <input type="text" id="oauth-redirect-uri" readonly value="" />
+                      <button id="copy-redirect-uri-btn" title="Copy redirect URI" aria-label="Copy redirect URI" type="button">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+                          <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="settings-field">
+                    <label for="github-client-id-input">Client ID</label>
+                    <input
+                      type="text"
+                      id="github-client-id-input"
+                      placeholder="Iv1.xxxxxxxxxxxx"
+                      autocomplete="off"
+                      spellcheck="false"
+                    />
+                  </div>
+                  <div class="settings-field">
+                    <label for="github-client-secret-input">Client Secret</label>
+                    <div class="token-input-wrapper">
+                      <input
+                        type="password"
+                        id="github-client-secret-input"
+                        placeholder="Client Secret"
+                        autocomplete="off"
+                        spellcheck="false"
+                      />
+                      <button class="toggle-visibility-btn" data-target="github-client-secret-input" title="Show/hide secret" aria-label="Toggle secret visibility" type="button">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                          <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                  <button class="connect-oauth-btn" id="connect-oauth-btn" type="button">Connect via OAuth</button>
+                </div>
+              </div>
+            </div>
+
+
+
+            <!-- AI Settings Section -->
+            <div class="settings-section">
+              <div class="settings-section-title">AI Settings</div>
+
+              <!-- Connection Status Row -->
+              <div class="ai-settings-status-row" id="ai-settings-status-row">
+                <div class="ai-settings-status-left">
+                  <span class="ai-settings-status-dot" id="ai-settings-status-dot"></span>
+                  <span class="ai-settings-status-label" id="ai-settings-status-label">Not Connected</span>
+                </div>
+                <span class="ai-settings-status-hint" id="ai-settings-status-hint">No API key configured</span>
+              </div>
+
+              <!-- Replace Key Row (shown only when connected) -->
+              <div class="ai-settings-key-actions" id="ai-settings-key-actions" style="display: none;">
+                <div class="ai-settings-replace-row">
+                  <div class="ai-settings-input-row">
+                    <input type="password" id="ai-settings-new-key-input" class="ai-settings-input" placeholder="Enter new API key…" autocomplete="off" spellcheck="false" aria-label="New Gemini API Key" />
+                    <button class="toggle-visibility-btn" data-target="ai-settings-new-key-input" title="Show/hide key" aria-label="Toggle key visibility" type="button">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                    </button>
+                  </div>
+                  <button class="ai-settings-replace-btn" id="ai-settings-replace-btn" type="button">Replace Key</button>
+                </div>
+                <button class="ai-settings-delete-btn" id="ai-settings-delete-btn" type="button">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+                  Delete API Key
+                </button>
+              </div>
+
+              <!-- Setup Row (shown only when not connected) -->
+              <div class="ai-settings-setup-row" id="ai-settings-setup-row">
+                <p class="ai-settings-setup-hint">Configure your Gemini API Key in the AI Workspace tab.</p>
+                <a href="https://aistudio.google.com/app/apikey" target="_blank" class="ai-settings-link">Get a free API Key →</a>
+              </div>
+            </div>
+
+
+            <!-- Preferences Section -->
+            <div class="settings-section">
+              <div class="settings-section-title">Preferences</div>
+              
+              <div class="settings-field checkbox-field" style="display: flex; align-items: flex-start; gap: 8px; flex-direction: column;">
+                <label class="checkbox-container" style="display: inline-flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13px; font-weight: 500; color: var(--text-primary);">
+                  <input type="checkbox" id="notifications-enabled-checkbox" checked style="width: 16px; height: 16px; accent-color: var(--accent-color); cursor: pointer;" />
+                  <span>Enable Real-time Notifications</span>
+                </label>
+                <span class="settings-hint">Receive background alerts for stargazers & followers</span>
+              </div>
+              
+              <div class="settings-field">
+                <label for="dashboard-layout-select">Dashboard View</label>
+                <select id="dashboard-layout-select" style="width: 100%; padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-primary); color: var(--text-primary); font-size: 12px; outline: none; cursor: pointer; transition: border-color 0.15s;">
+                  <option value="standard">Standard Grid</option>
+                  <option value="compact">Compact List</option>
+                  <option value="detailed">Detailed Analysis</option>
+                </select>
+                <span class="settings-hint">Preferred visual layout for your repository stats</span>
+              </div>
+              
+              <div class="settings-field">
+                <label for="ai-mode-select">AI Generation Mode</label>
+                <select id="ai-mode-select" style="width: 100%; padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-primary); color: var(--text-primary); font-size: 12px; outline: none; cursor: pointer; transition: border-color 0.15s;">
+                  <option value="balanced">Balanced</option>
+                  <option value="creative">Creative / Brainstorm</option>
+                  <option value="precise">Precise / Analytics</option>
+                </select>
+                <span class="settings-hint">Controls tone and temperature for Gemini insights</span>
+              </div>
+            </div>
+
+            <!-- Actions Section -->
+            <div class="settings-section settings-actions-section">
+              <div class="settings-section-title">Actions</div>
+              <button class="save-settings-btn" id="save-settings-btn" type="button">Save Settings</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Notifications Panel (absolute positioned overlay) -->
+        <div class="notifications-panel" id="notifications-panel" role="dialog" aria-label="Notifications">
+          <div class="notifications-header">
+            <h4>Notifications</h4>
+          </div>
+          <div class="notifications-body">
+            <div class="empty-state notification-empty">
+              <div class="empty-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                  <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+              </div>
+              <p>All caught up!</p>
+              <span>No new notifications at this time.</span>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Global Error Message Container -->
+      <div class="error-container-wrapper">
+        <div class="error-message" id="error-message" role="alert" style="display:none"></div>
+      </div>
+
+      <!-- ── Main Content Area ── -->
+      <main class="content-area" id="content-area">
+
+        <!-- Profile Tab (Dashboard view) -->
+        <section
+          id="tab-profile"
+          role="tabpanel"
+          aria-labelledby="tab-btn-profile"
+          class="tab-content tab-active tab-fade-in"
+        >
+          <div id="profile-container">
+            <!-- Premium Welcome Dashboard -->
+            <div class="welcome-state" id="welcome-state">
+              <div class="dashboard-grid">
+                <!-- Welcome Card -->
+                <div class="dashboard-card welcome-card">
+                  <div class="welcome-dashboard-header">
+                    <div class="welcome-icon-wrapper">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/>
+                        <path d="M9 18c-4.51 2-5-2-7-2"/>
+                      </svg>
+                    </div>
+                    <div class="welcome-text-content">
+                      <h2 class="welcome-greeting">Welcome Back</h2>
+                      <p class="welcome-subtitle">Search for any GitHub developer to generate insights.</p>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Quick Actions -->
+                <div class="dashboard-card actions-card">
+                  <h3 class="card-title">Quick Actions</h3>
+                  <div class="quick-actions-grid">
+                    <button class="quick-action-btn" type="button" onclick="document.getElementById('search-input').focus()">
+                      <span class="qa-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></span>
+                      <span class="qa-label">Search Developer</span>
+                    </button>
+                    <button class="quick-action-btn" type="button" onclick="document.getElementById('tab-btn-favorites').click()">
+                      <span class="qa-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg></span>
+                      <span class="qa-label">View Favorites</span>
+                    </button>
+                    <button class="quick-action-btn" type="button" onclick="document.getElementById('tab-btn-ai').click()">
+                      <span class="qa-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg></span>
+                      <span class="qa-label">AI Workspace</span>
+                    </button>
+                    <button class="quick-action-btn" type="button" onclick="document.getElementById('settings-btn').click()">
+                      <span class="qa-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg></span>
+                      <span class="qa-label">Preferences</span>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Setup Tip -->
+                <div class="db-tips-panel">
+                  <svg viewBox="0 0 24 24" class="tip-icon" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="16" x2="12" y2="12"></line>
+                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                  </svg>
+                  <span class="tip-text">Pro Tip — Add a GitHub token in Settings for 5,000 req/hr.</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Repos Tab -->
+        <section
+          id="tab-repos"
+          role="tabpanel"
+          aria-labelledby="tab-btn-repos"
+          class="tab-content"
+        >
+          <div class="empty-state">
+            <div class="empty-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+              </svg>
+            </div>
+            <p>Search for a developer to see their repositories.</p>
+          </div>
+        </section>
+
+
+
+        <!-- Dashboard Tab -->
+        <section
+          id="tab-dashboard"
+          role="tabpanel"
+          aria-labelledby="tab-btn-dashboard"
+          class="tab-content"
+        >
+          <div class="empty-state">
+            <div class="empty-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="20" x2="18" y2="10"></line>
+                <line x1="12" y1="20" x2="12" y2="4"></line>
+                <line x1="6" y1="20" x2="6" y2="14"></line>
+              </svg>
+            </div>
+            <p>Search for a developer to see their analytics dashboard.</p>
+          </div>
+        </section>
+
+        <!-- AI Workspace Tab -->
+        <section
+          id="tab-ai"
+          role="tabpanel"
+          aria-labelledby="tab-btn-ai"
+          class="tab-content"
+        >
+          <!-- API Key Setup Card — shown only when no valid key exists -->
+          <div id="ai-setup-card" class="ai-setup-card" style="display: none;">
+            <div class="ai-setup-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z"/>
+                <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/>
+              </svg>
+            </div>
+            <h3 class="ai-setup-title">Unlock AI Features</h3>
+            <p class="ai-setup-desc">Enter your Google Gemini API Key to unlock AI features. Your key is stored securely on your device and never sent to DevAssist servers.</p>
+            <a href="https://aistudio.google.com/app/apikey" target="_blank" class="ai-setup-link">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+              Get a free Gemini API Key from Google AI Studio
+            </a>
+            <div class="ai-setup-form">
+              <div class="ai-setup-input-row">
+                <input type="password" id="ai-setup-key-input" class="ai-setup-input" placeholder="AIzaSy..." autocomplete="off" spellcheck="false" aria-label="Gemini API Key" />
+                <button class="toggle-visibility-btn ai-setup-eye-btn" data-target="ai-setup-key-input" title="Show/hide key" aria-label="Toggle key visibility" type="button">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                </button>
+              </div>
+              <div class="ai-setup-error" id="ai-setup-error" style="display:none;"></div>
+              <button class="ai-setup-activate-btn" id="ai-setup-activate-btn" type="button">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+                Activate AI Features
+              </button>
+            </div>
+          </div>
+
+          <!-- AI Workspace — shown after key is activated -->
+          <div id="ai-insights-container" class="ai-insights-panel" style="display: none;">
+            <div class="ai-panel-header">
+              <h3>AI Command Center</h3>
+              <div style="display: flex; gap: 8px; align-items: center;">
+                <button class="icon-btn" id="ai-manage-key-btn" title="Manage API Key" style="background: none; border: none; cursor: pointer; padding: 4px; color: var(--text-muted);">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 9.36l-7.19 7.19v-3h-3v-3h3v-3h-3v-3h3l4.63-4.63a6 6 0 0 1 9.36-7.94l-3.77 3.77z"/></svg>
+                </button>
+                <span class="ai-gemini-badge" id="ai-gemini-badge">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                  Gemini Connected
+                </span>
+              </div>
+            </div>
+
+            <!-- Mode Switcher -->
+            <div class="ai-mode-tabs" id="ai-mode-tabs" style="display: flex; gap: 8px; margin-bottom: 16px; border-bottom: 1px solid var(--border-color); padding-bottom: 16px;">
+              <button class="ai-btn ai-mode-tab active" data-mode="developer" type="button" style="flex: 1; justify-content: center; background: var(--bg-secondary); border-color: var(--border-color); font-weight: 500; color: var(--text-primary);">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                Developer
+              </button>
+              <button class="ai-btn ai-mode-tab" data-mode="repository" type="button" style="flex: 1; justify-content: center; background: transparent; color: #8b949e; border-color: var(--border-color); font-weight: 500;">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+                Repository
+              </button>
+            </div>
+
+            <!-- Developer Mode Container -->
+            <div id="ai-developer-mode">
+              <p class="ai-hint" style="margin-bottom: 16px;">Select a prompt template below to generate intelligence for this developer.</p>
+              <div class="ai-buttons-grid">
+                <button class="ai-btn" id="ai-summarize" type="button">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                    <polyline points="10 9 9 9 8 9"></polyline>
+                  </svg>
+                  Profile Summary
+                </button>
+                <button class="ai-btn" id="ai-repos" type="button">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                  </svg>
+                  Analyze Repos
+                </button>
+                <button class="ai-btn" id="ai-learning" type="button">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                  </svg>
+                  Learning Path
+                </button>
+                <button class="ai-btn" id="ai-ideas" type="button">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                    <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                    <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                  </svg>
+                  Project Ideas
+                </button>
+              </div>
+            </div>
+
+            <!-- Repository Mode Container -->
+            <div id="ai-repository-mode" style="display: none;">
+              <p class="ai-hint" id="ai-repo-hint-msg" style="margin-bottom: 12px;">Select an analysis path to generate intelligence for a project.</p>
+              
+              <!-- Input Path Toggle -->
+              <div class="ai-path-toggle" id="ai-path-toggle" style="display: flex; gap: 6px; margin-bottom: 12px; background: var(--bg-primary); padding: 4px; border-radius: 8px; border: 1px solid var(--border-color);">
+                <button class="ai-btn ai-path-tab active" data-path="github" type="button" style="flex: 1; padding: 6px 4px; font-size: 11px; justify-content: center; background: var(--bg-secondary); border: none; font-weight: 500; border-radius: 6px; color: var(--text-primary);">GitHub URL</button>
+                <button class="ai-btn ai-path-tab" data-path="local" type="button" style="flex: 1; padding: 6px 4px; font-size: 11px; justify-content: center; background: transparent; color: #8b949e; border: none; font-weight: 500; border-radius: 6px;">Local Folder</button>
+                <button class="ai-btn ai-path-tab" data-path="publish" type="button" style="flex: 1; padding: 6px 4px; font-size: 11px; justify-content: center; background: transparent; color: #8b949e; border: none; font-weight: 500; border-radius: 6px;">Push Project</button>
+              </div>
+
+              <!-- Repo URL Input Row -->
+              <div id="ai-repo-url-row" style="display: flex; gap: 8px; margin-bottom: 16px;">
+                <input type="text" id="ai-repo-input" placeholder="owner/repo or https://github.com/owner/repo" class="search-input" style="flex: 1;" spellcheck="false" autocomplete="off" />
+                <button class="ai-btn" id="ai-repo-analyze-btn" type="button" style="margin: 0; padding: 0 16px;">
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                  Analyze
+                </button>
+              </div>
+
+              <!-- Local Folder Input Row -->
+              <div id="ai-repo-local-row" style="display: none; flex-direction: column; gap: 8px; margin-bottom: 16px;">
+                <button class="ai-btn" id="ai-repo-select-folder-btn" type="button" style="width: 100%; justify-content: center; margin: 0;">
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+                  Select Local Folder
+                </button>
+                <!-- Quick Resume Panel -->
+                <div id="ai-repo-resume-panel" style="display: none; align-items: center; justify-content: space-between; padding: 8px 12px; border-radius: 6px; border: 1px dashed var(--border-color); font-size: 12px; color: var(--text-muted);">
+                  <span id="ai-repo-resume-text">Continue with folder?</span>
+                  <button class="ai-btn" id="ai-repo-resume-btn" type="button" style="margin: 0; padding: 2px 8px; font-size: 11px;">Resume</button>
+                </div>
+              </div>
+
+              <!-- Publish Project Row -->
+              <div id="ai-repo-publish-row" style="display: none; flex-direction: column; gap: 8px; margin-bottom: 16px;">
+                <button class="ai-btn" id="ai-repo-publish-folder-btn" type="button" style="width: 100%; justify-content: center; margin: 0; background: var(--github-green); color: white; border-color: var(--github-green);">
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                  Select Folder to Push
+                </button>
+              </div>
+
+              <!-- Progress Indicator -->
+              <div id="ai-repo-progress" style="display: none; align-items: center; gap: 8px; margin-bottom: 16px; color: var(--text-muted); font-size: 13px;">
+                <div class="spinner" style="width: 16px; height: 16px; border-width: 2px;"></div>
+                <span id="ai-repo-progress-msg">Analyzing repository...</span>
+              </div>
+
+              <!-- Context Card -->
+              <div id="ai-repo-context-card" style="display: none; border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; margin-bottom: 16px; background: var(--bg-secondary);">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                  <div>
+                    <h4 id="ai-repo-context-name" style="margin: 0 0 4px 0; font-size: 14px; color: var(--text-primary);"></h4>
+                    <div id="ai-repo-context-meta" style="font-size: 12px; color: var(--text-muted);"></div>
+                  </div>
+                  <button class="icon-btn" id="ai-repo-context-clear" title="Clear repository" style="color: var(--text-muted);">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                  </button>
+                </div>
+                <div id="ai-repo-context-tags" style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px;"></div>
+              </div>
+
+              <!-- Feature Modules -->
+              <div id="ai-repo-features" style="display: none;">
+                <!-- Documentation -->
+                <h4 style="margin: 0 0 8px 0; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted);">Documentation</h4>
+                <div class="ai-buttons-grid" style="margin-bottom: 16px;">
+                  <button class="ai-btn" data-repo-action="readme" type="button">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    Generate README
+                  </button>
+                  <button class="ai-btn" data-repo-action="architecture" type="button">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+                    Architecture Docs
+                  </button>
+                  <button class="ai-btn" data-repo-action="roadmap" type="button">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="3"></circle><line x1="12" y1="22" x2="12" y2="8"></line><path d="M5 12H2a10 10 0 0 0 20 0h-3"></path></svg>
+                    Roadmap
+                  </button>
+                </div>
+
+                <!-- Engineering Review -->
+                <h4 style="margin: 0 0 8px 0; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted);">Engineering Review</h4>
+                <div class="ai-buttons-grid" style="margin-bottom: 16px;">
+                  <button class="ai-btn" data-repo-action="codereview" type="button">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+                    Code Review
+                  </button>
+                  <button class="ai-btn" data-repo-action="security" type="button">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                    Security Review
+                  </button>
+                </div>
+
+                <!-- Git Assistant -->
+                <h4 style="margin: 0 0 8px 0; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted);">Git Assistant</h4>
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                  <div style="display: flex; gap: 8px;">
+                    <input type="text" id="ai-commit-input" placeholder="What did you change?" class="search-input" style="flex: 1;" />
+                    <button class="ai-btn" data-repo-action="commit" type="button" style="margin: 0; padding: 0 16px;">
+                      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><line x1="3" y1="12" x2="9" y2="12"></line><line x1="15" y1="12" x2="21" y2="12"></line></svg>
+                      Commit Msg
+                    </button>
+                  </div>
+                  <div style="display: flex; gap: 8px;">
+                    <input type="text" id="ai-pr-summary-input" placeholder="Summary of branch/PR changes" class="search-input" style="flex: 1;" />
+                    <button class="ai-btn" data-repo-action="pr" type="button" style="margin: 0; padding: 0 16px;">
+                      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3v18"></path><circle cx="18" cy="6" r="3"></circle><circle cx="6" cy="18" r="3"></circle><path d="M18 9a9 9 0 0 1-9 9"></path></svg>
+                      PR Desc
+                    </button>
+                  </div>
+                  <!-- Publish to GitHub Button (Local only) -->
+                  <div style="display: flex; margin-top: 4px;">
+                    <button class="ai-btn" id="publish-github-btn" type="button" style="width: 100%; justify-content: center; background: var(--bg-secondary); border: 1px dashed var(--border-color); color: var(--text-primary); display: none;">
+                      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+                      Publish to GitHub
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="ai-response-area" id="ai-response-area"></div>
+          </div>
+
+          <!-- Empty State — shown before a developer is searched -->
+          <div class="empty-state" id="ai-empty-state">
+            <div class="empty-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/>
+              </svg>
+            </div>
+            <h3>AI Command Center</h3>
+            <p>Your intelligent assistant is ready.</p>
+            <span>Search for a GitHub developer to unlock automated profile summaries, repository analysis, and learning path generation.</span>
+          </div>
+        </section>
+
+
+        <!-- Favorites Tab -->
+        <section
+          id="tab-favorites"
+          role="tabpanel"
+          aria-labelledby="tab-btn-favorites"
+          class="tab-content"
+        >
+          <div class="empty-state">
+            <div class="empty-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+              </svg>
+            </div>
+            <h3>No Favorites Yet</h3>
+            <p>You haven't saved any developers.</p>
+            <span>Search for a GitHub developer and click the bookmark icon to save them here for quick access.</span>
+          </div>
+        </section>
+
+        <!-- History Tab -->
+        <section
+          id="tab-history"
+          role="tabpanel"
+          aria-labelledby="tab-btn-history"
+          class="tab-content"
+        >
+          <div class="empty-state">
+            <div class="empty-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+              </svg>
+            </div>
+            <h3>No History</h3>
+            <p>Your recent lookups will appear here.</p>
+            <span>DevAssist automatically logs every developer profile you analyze for fast re-access.</span>
+          </div>
+        </section>
+
+      </main>
+
+      <!-- ── Footer ── -->
+      <footer class="popup-footer" id="popup-footer">
+        <span class="footer-brand">DevAssist <span class="footer-version">v1.0.0</span></span>
+        <span id="rate-limit-display" class="rate-limit"></span>
+      </footer>
+
+    </div><!-- end .main-layout -->
+
+  </div><!-- end .popup-wrapper -->
+
+  <!-- Confirmation Modal -->
+  <div class="modal-overlay" id="confirm-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="modal-title" tabindex="-1">
+    <div class="modal-content">
+      <h3 id="modal-title" class="modal-title">Sign out?</h3>
+      <p class="modal-body">This will disconnect your current GitHub session.</p>
+      <div class="modal-actions">
+        <button class="modal-btn modal-btn-cancel" id="confirm-modal-cancel" type="button" aria-label="Cancel sign out">Cancel</button>
+        <button class="modal-btn modal-btn-confirm" id="confirm-modal-logout" type="button" aria-label="Confirm sign out">Logout</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Publish to GitHub Modal -->
+  <div class="modal-overlay" id="publish-modal" style="display: none;" role="dialog" aria-modal="true" tabindex="-1">
+    <div class="modal-content" style="width: 320px; text-align: left;">
+      <h3 class="modal-title" style="margin-bottom: 12px; font-size: 16px;">Publish to GitHub</h3>
+      
+      <div class="settings-group" style="padding: 0; background: transparent; border: none; margin-bottom: 12px; display: flex; flex-direction: column; gap: 14px;">
+        <div class="settings-field">
+          <label>Repository name *</label>
+          <input type="text" id="publish-repo-name" class="settings-input" style="box-sizing: border-box;" required />
+        </div>
+        
+        <div class="settings-field">
+          <label>Description</label>
+          <input type="text" id="publish-repo-desc" class="settings-input" style="box-sizing: border-box;" />
+        </div>
+        
+        <div class="settings-field">
+          <label>Visibility *</label>
+          <select id="publish-repo-visibility" class="settings-input" style="box-sizing: border-box;">
+            <option value="public">Public</option>
+            <option value="private">Private</option>
+          </select>
+        </div>
+        
+        <div class="settings-field">
+          <label>License template</label>
+          <select id="publish-repo-license" class="settings-input" style="box-sizing: border-box;">
+            <option value="">No license</option>
+            <option value="mit">MIT License</option>
+            <option value="apache-2.0">Apache License 2.0</option>
+            <option value="gpl-3.0">GNU General Public License v3.0</option>
+            <option value="agpl-3.0">GNU Affero General Public License v3.0</option>
+            <option value="bsd-2-clause">BSD 2-Clause</option>
+            <option value="bsd-3-clause">BSD 3-Clause</option>
+          </select>
+        </div>
+        
+        <div class="settings-field" style="margin-top: 4px;">
+          <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--text-primary);">
+            <input type="checkbox" id="publish-repo-readme" checked style="width: 16px; height: 16px; margin: 0; padding: 0; flex-shrink: 0; cursor: pointer; accent-color: var(--accent-color);" />
+            <span style="font-size: 13px;">Generate AI README automatically</span>
+          </label>
+        </div>
+      </div>
+      
+      <div class="modal-actions" style="margin-top: 16px;">
+        <button class="modal-btn modal-btn-cancel" id="publish-cancel-btn" type="button">Cancel</button>
+        <button class="modal-btn modal-btn-confirm" id="publish-confirm-btn" type="button" style="background: var(--github-green); color: white;">Publish</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Global Toast Notification Container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- Print-only styles -->
+  <div id="print-content" style="display:none">
+    <div id="print-profile-area"></div>
+  </div>
+
+  <script type="module" src="popup.js"></script>
+</body>
+</html>

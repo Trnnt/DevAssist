@@ -1,0 +1,25 @@
+{
+  "name": "devassist-backend",
+  "version": "1.0.0",
+  "description": "Backend for DevAssist Chrome Extension",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "start:pm2": "pm2 start server.js --name \"devassist-backend\"",
+    "stop:pm2": "pm2 stop devassist-backend",
+    "restart:pm2": "pm2 restart devassist-backend",
+    "logs:pm2": "pm2 logs devassist-backend",
+    "status:pm2": "pm2 status",
+    "save:pm2": "pm2 save"
+  },
+  "dependencies": {
+    "axios": "^1.6.8",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-rate-limit": "^8.5.2",
+    "firebase-admin": "^12.1.0",
+    "helmet": "^8.2.0",
+    "jsonwebtoken": "^9.0.3"
+  }
+}

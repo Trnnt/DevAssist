@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacy Policy — GitHub Developer Assistant</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      max-width: 680px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+    h1 {
+      border-bottom: 1px solid #eaeaea;
+      padding-bottom: 10px;
+      font-size: 24px;
+    }
+    h2 {
+      font-size: 18px;
+      margin-top: 30px;
+    }
+    p, li {
+      font-size: 14px;
+      color: #555;
+    }
+    ul {
+      padding-left: 20px;
+    }
+    footer {
+      margin-top: 50px;
+      border-top: 1px solid #eaeaea;
+      padding-top: 20px;
+      font-size: 12px;
+      color: #777;
+    }
+  </style>
+</head>
+<body>
+  <h1>Privacy Policy for GitHub Developer Assistant</h1>
+  <p>Last updated: June 6, 2026</p>
+
+  <p>GitHub Developer Assistant is a browser extension designed to help developers and recruiters visualize GitHub profiles, track repositories, analyze statistics, and generate AI-powered insights using the Google Gemini API.</p>
+
+  <h2>1. Data Collection and Usage</h2>
+  <p>We believe in absolute data privacy. Here is how your data is handled:</p>
+  <ul>
+    <li><strong>GitHub Access Tokens:</strong> If you optionally supply a GitHub Personal Access Token to raise rate limits, it is stored locally on your device using Chrome's secure storage API (<code>chrome.storage.local</code>). It is only sent directly to official GitHub API endpoints (<code>api.github.com</code>) to authenticate requests.</li>
+    <li><strong>Gemini API Keys:</strong> If you supply a Google Gemini API Key, it is stored locally on your device. It is only sent directly to Google's official Generative Language API endpoint to retrieve AI insights.</li>
+    <li><strong>Favorites List:</strong> Any profiles you save as favorites are saved locally on your machine.</li>
+    <li><strong>No External Trackers:</strong> The extension does not collect, track, or share any personal data, usage telemetry, or browsing history with third parties or external servers.</li>
+  </ul>
+
+  <h2>2. Permissions Requested</h2>
+  <ul>
+    <li><code>storage</code>: To persist your light/dark theme preference, saved favorites, GitHub token, and Gemini API key across browser sessions.</li>
+    <li><code>https://api.github.com/*</code>: To query developer profile details and repository data.</li>
+    <li><code>https://generativelanguage.googleapis.com/*</code>: To call the Gemini API for profile summaries, repo explanations, and suggestions.</li>
+  </ul>
+
+  <h2>3. Third-Party Services</h2>
+  <p>By using the optional AI features, data (specifically the developer's public profile details, bio, and list of public repositories) will be processed by Google's Gemini API according to Google AI Studio's terms of service.</p>
+
+  <h2>4. Contact</h2>
+  <p>For any questions or suggestions regarding this privacy policy, please contact us via the GitHub Developer Assistant repository page.</p>
+
+  <footer>
+    <p>&copy; 2026 GitHub Developer Assistant. All rights reserved.</p>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,34 @@
+{
+  "manifest_version": 3,
+  "name": "GitHub Developer Assistant",
+  "version": "1.0.0",
+  "description": "Analyze GitHub profiles, visualize developer stats, get AI insights, and manage favorite developers — all from your browser toolbar.",
+  "icons": {
+    "16": "assets/icons/icon16.png",
+    "48": "assets/icons/icon48.png",
+    "128": "assets/icons/icon128.png"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "assets/icons/icon16.png",
+      "48": "assets/icons/icon48.png",
+      "128": "assets/icons/icon128.png"
+    },
+    "default_title": "GitHub Developer Assistant"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "permissions": [
+    "storage",
+    "identity",
+    "alarms"
+  ],
+  "host_permissions": [
+    "https://api.github.com/*",
+    "https://github.com/*",
+    "https://generativelanguage.googleapis.com/*",
+    "<all_urls>"
+  ]
+}
