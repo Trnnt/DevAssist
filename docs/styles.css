@@ -331,4 +331,119 @@ footer {
     .features-grid {
         grid-template-columns: 1fr;
     }
+    
+    .projects-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Live Projects Section */
+.projects-section {
+    max-width: 900px;
+    margin: 5rem auto;
+    padding: 0 5%;
+}
+
+.projects-title {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    font-weight: 700;
+}
+
+.projects-note {
+    border-left: 3px solid #334155;
+    padding-left: 1rem;
+    margin-bottom: 1.5rem;
+    margin-top: 1.5rem;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+}
+
+.projects-note code {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 0.2rem 0.4rem;
+    border-radius: 4px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85em;
+}
+
+.projects-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border: 1px solid var(--glass-border);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.project-card {
+    padding: 2rem;
+    border-right: 1px solid var(--glass-border);
+    background: rgba(255, 255, 255, 0.01);
+}
+
+.project-card:last-child {
+    border-right: none;
+}
+
+.project-card h3 {
+    font-size: 1.25rem;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.project-card p {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    margin-bottom: 2rem;
+    min-height: 48px;
+}
+
+.project-buttons {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.cyan-btn {
+    background: #67e8f9;
+    color: #000;
+}
+
+.cyan-btn:hover {
+    background: #22d3ee;
+    transform: translateY(0);
+    box-shadow: none;
+}
+
+.dark-btn {
+    background: #111827;
+    color: #fff;
+}
+
+.dark-btn:hover {
+    background: #1f2937;
+}
+
+.btn i {
+    width: 14px;
+    height: 14px;
 }
