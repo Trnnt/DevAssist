@@ -17,24 +17,13 @@ DevAssist is a production-ready Chrome Extension that bridges the gap between yo
 
 ---
 
-## 📥 How to Install & Use (Free)
+## 📥 Distribution Status
 
-Since this extension is an advanced developer tool, it is distributed directly via GitHub. You can install it into Chrome in less than a minute:
+**Status: Closed Beta / Pre-Release**
 
-1. **Download the Extension:**
-   Go to the top of this repository, click the green **Code** button, and select **Download ZIP**. Extract the folder to your computer.
+To ensure code integrity and provide the best user experience, DevAssist is currently being minified and packaged for an official release on the Google Chrome Web Store. 
 
-2. **Open Chrome Extensions:**
-   Open Google Chrome and type `chrome://extensions/` into the URL bar and hit Enter.
-
-3. **Enable Developer Mode:**
-   In the top right corner of the page, toggle the switch for **Developer mode** to ON.
-
-4. **Load the Extension:**
-   Click the **Load unpacked** button at the top left. Select the `DevAssist` folder you extracted in Step 1.
-
-🎉 **That's it!** The DevAssist icon will now appear in your Chrome toolbar. Click it, log in with GitHub, and start analyzing!
-
+*Public installation instructions will be provided upon official Web Store approval.*
 ---
 
 *Designed and engineered by Nishant Kumar.*
