@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevAssist - AI-Powered GitHub Extension</title>
+    <meta name="description" content="Supercharge your GitHub workflow with Google Gemini AI. Analyze local codebases and push directly from your browser.">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    
+    <nav class="navbar">
+        <div class="logo">
+            <i data-lucide="cpu" class="logo-icon"></i>
+            <span>DevAssist</span>
+        </div>
+        <div class="nav-links">
+            <a href="#features">Features</a>
+            <a href="#how-it-works">Demo</a>
+            <a href="https://github.com/Trnnt/DevAssist" target="_blank" class="github-btn">
+                <i data-lucide="github"></i> View Source
+            </a>
+        </div>
+    </nav>
+
+    <main>
+        <section class="hero">
+            <div class="hero-content">
+                <div class="badge">🚀 Closed Beta Live Now</div>
+                <h1>Supercharge your<br><span class="gradient-text">GitHub Workflow</span></h1>
+                <p>Bridge the gap between your local environment and GitHub. Analyze codebases and generate documentation instantly using Google's Gemini AI.</p>
+                <div class="cta-group">
+                    <a href="#coming-soon" class="btn primary-btn">Install Extension</a>
+                    <a href="#how-it-works" class="btn secondary-btn">Watch Live Demo</a>
+                </div>
+            </div>
+            <div class="hero-image">
+                <div class="glass-card">
+                    <img src="assets/hero_mockup.png" alt="DevAssist Interface Mockup">
+                </div>
+            </div>
+        </section>
+
+        <section id="features" class="features">
+            <h2>Next-Gen Capabilities</h2>
+            <div class="features-grid">
+                <div class="feature-card glass-panel">
+                    <div class="icon-wrapper"><i data-lucide="scan"></i></div>
+                    <h3>Smart Project Scanner</h3>
+                    <p>Automatically scans local folders to categorize source code, dependencies, and project architectures securely.</p>
+                </div>
+                <div class="feature-card glass-panel">
+                    <div class="icon-wrapper"><i data-lucide="sparkles"></i></div>
+                    <h3>Gemini AI Insights</h3>
+                    <p>Generates rich, professional README files and codebase explanations on the fly without writing a single word.</p>
+                </div>
+                <div class="feature-card glass-panel">
+                    <div class="icon-wrapper"><i data-lucide="shield-check"></i></div>
+                    <h3>Stateless Security</h3>
+                    <p>Hardened Node.js proxy utilizing OAuth 2.0 and JWT. Prevents sensitive `.env` variables from leaking to GitHub.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="how-it-works" class="demo-section glass-panel">
+            <h2>Live Demo</h2>
+            <p class="demo-subtitle">See how DevAssist translates local folders into production-ready repositories in seconds.</p>
+            <div class="video-placeholder">
+                <i data-lucide="play-circle" class="play-icon"></i>
+                <p>Demo Video Coming Soon...</p>
+                <!-- NOTE: Add your GIF or MP4 video here for the live demo -->
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Designed & Engineered by Nishant Kumar. Not affiliated with Google or GitHub.</p>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>
