@@ -1,6 +1,5 @@
 {
   "manifest_version": 3,
-  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAuZ6kiE4vnSpAYR7LakgLE1GUBUvOj87GhgtJ3Jy9Ijw7JIErvlhLCarVA43+j7eQiPkMpvhCiWXjYiPvLy6mVM7ERM+e46Hw+K4ldPkofA9GHwarky4NJ0vnU+KnweJjSDwMHk1ugFFot0fCaV0L9kNL7PwI8vQCHL0icXmY86ES99Y7dXD+QJgQJw89dKUh+zdiJj7X6cpY9O57MWSCuLdlJgK+fCyzVUVEHdfoOpCO1BToAgb3Ui/5siV+C8OSD3e5YtslbItySBpUhlmD+dBhjwxuI3Uo6RhNXpj/oaR/swMxfc3BGXTKA3WxKMEuHA8UOf8mfuj+oCJrPjY0UwIDAQAB",
   "name": "GitHub Developer Assistant",
   "version": "1.0.0",
   "description": "Analyze GitHub profiles, visualize developer stats, get AI insights, and manage favorite developers — all from your browser toolbar.",
