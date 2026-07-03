@@ -357,7 +357,7 @@ export async function migrateLegacyToken() {
       await set(STORAGE_KEYS.GITHUB_PAT_TOKEN, legacy);
     }
     await remove(STORAGE_KEYS.GITHUB_TOKEN);
-    console.log(`[Storage Migration] Successfully migrated legacy token to ${method.toUpperCase()} slot.`);
+
   }
 }
 

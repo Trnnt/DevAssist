@@ -1074,7 +1074,7 @@ function attachEventListeners(userMenu) {
  */
 async function performTokenExchange(bgResponse) {
   const clientId = bgResponse.clientId || 'Ov23liOvHUl1MK65i9LM';
-  const clientSecret = bgResponse.clientSecret || 'b9a6fade676b5d309eb1f4859b8f6da616b14609';
+  const clientSecret = bgResponse.clientSecret || '';
 
   const res = await fetch('https://github.com/login/oauth/access_token', {
     method: 'POST',

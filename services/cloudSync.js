@@ -118,7 +118,7 @@ async function _drainQueue() {
   for (const op of queue) {
     try {
       await apiFetch(op.path, op.options);
-      console.log(`[SyncQueue] Replayed: ${op.options.method} ${op.path}`);
+
     } catch (err) {
       if (err.type === 'NETWORK_ERROR') {
         remaining.push(op); // Keep for next retry
@@ -360,7 +360,6 @@ export async function syncAfterLogin(
       onSettingsLoaded?.(settings.value);
     }
 
-    console.log('[CloudSync] Post-login sync complete.');
   } catch (err) {
     // Non-fatal — extension still works locally
     console.warn('[CloudSync] Sync after login partially failed:', err.message);

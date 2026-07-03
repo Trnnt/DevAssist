@@ -34,7 +34,7 @@ try {
     const dbId = process.env.FIRESTORE_DATABASE_ID || 'default';
     db.settings({ databaseId: dbId });
     adminSdkInitialized = true;
-    console.log(`[Firebase] Admin SDK initialized. DB: ${dbId}`);
+
   } else {
     console.warn('[Firebase] Running in fallback mode. Set FIREBASE_SERVICE_ACCOUNT env var.');
   }
@@ -159,7 +159,7 @@ async function upsertUserProfile(profile) {
         aiPreferences: {}
       }
     });
-    console.log(`[Firestore] Created new user profile: ${profile.login}`);
+
   } else {
     // Returning user — only update mutable fields
     await userRef.update({
@@ -173,7 +173,7 @@ async function upsertUserProfile(profile) {
       blog: profile.blog || null,
       lastLoginAt: now,
     });
-    console.log(`[Firestore] Updated lastLoginAt for: ${profile.login}`);
+
   }
 
   return githubUid;
@@ -636,5 +636,5 @@ app.put('/api/settings', apiLimiter, authenticateToken, async (req, res) => {
 // ──────────────────────────────────────────────────────────────
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`[DevAssist Backend] Running on http://localhost:${PORT}`);
+
 });

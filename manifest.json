@@ -30,6 +30,9 @@
     "https://api.github.com/*",
     "https://github.com/*",
     "https://generativelanguage.googleapis.com/*",
-    "<all_urls>"
-  ]
+    "https://*.onrender.com/*"
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self';"
+  }
 }

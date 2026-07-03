@@ -403,7 +403,7 @@ class AuthStateManagerClass {
       const data = await response.json();
       if (data.accessToken) {
         await saveSessionAccessToken(data.accessToken);
-        console.log('[Auth] Backend tokens refreshed successfully.');
+
         return data.accessToken;
       }
       return null;
@@ -420,7 +420,7 @@ class AuthStateManagerClass {
   async getValidBackendToken() {
     let accessToken = await getSessionAccessToken();
     if (!accessToken || isTokenExpired(accessToken)) {
-      console.log('[Auth] Access token expired or missing. Refreshing...');
+
       accessToken = await this.refreshBackendTokens();
     }
     return accessToken;
