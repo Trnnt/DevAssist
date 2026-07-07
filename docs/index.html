@@ -66,10 +66,50 @@
             </div>
         </section>
 
-        <section id="how-it-works" class="demo-section glass-panel">
-            <h2>Live Demo</h2>
-            <div class="video-container" style="width: 100%; max-width: 900px; margin: 0 auto; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
-                <video src="assets/demo.mp4" autoplay loop muted playsinline style="width: 100%; display: block;"></video>
+        <section id="how-it-works" class="demo-section">
+            <div class="section-header">
+                <h2>See It In Action</h2>
+                <p class="section-subtitle">Experience the seamless workflow of DevAssist right from your browser.</p>
+            </div>
+            
+            <div class="demo-content">
+                <div class="demo-window glass-panel">
+                    <div class="window-header">
+                        <div class="window-controls">
+                            <span class="control close"></span>
+                            <span class="control minimize"></span>
+                            <span class="control maximize"></span>
+                        </div>
+                        <div class="window-title">DevAssist Workspace</div>
+                    </div>
+                    <div class="video-wrapper">
+                        <video src="assets/demo.mp4" autoplay loop muted playsinline></video>
+                    </div>
+                </div>
+
+                <div class="demo-steps">
+                    <div class="step-card">
+                        <div class="step-icon"><i data-lucide="github"></i></div>
+                        <div class="step-info">
+                            <h4>1. Connect Securely</h4>
+                            <p>Link your GitHub using OAuth 2.0 without exposing API keys.</p>
+                        </div>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-icon"><i data-lucide="cpu"></i></div>
+                        <div class="step-info">
+                            <h4>2. Let AI Analyze</h4>
+                            <p>Google Gemini scans your code, dependencies, and architecture.</p>
+                        </div>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-icon"><i data-lucide="file-text"></i></div>
+                        <div class="step-info">
+                            <h4>3. Generate & Push</h4>
+                            <p>Review the generated documentation and push directly to GitHub.</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
     </main>
