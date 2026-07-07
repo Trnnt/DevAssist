@@ -301,10 +301,10 @@ body {
 
 .demo-content {
     display: grid;
-    grid-template-columns: 1fr 350px;
+    grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
     gap: 3rem;
     align-items: center;
-    max-width: 1200px;
+    max-width: 1100px;
     margin: 0 auto;
 }
 
@@ -351,12 +351,22 @@ body {
     font-weight: 500;
 }
 
-.video-wrapper video {
+.video-wrapper {
+    position: relative;
     width: 100%;
-    max-height: 550px;
+    /* Standard 16:9 widescreen aspect ratio */
+    aspect-ratio: 16 / 9;
+    background: #000;
+}
+
+.video-wrapper video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
     object-fit: contain;
     display: block;
-    background: #000;
 }
 
 .demo-steps {
